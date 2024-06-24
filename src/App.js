@@ -1,25 +1,22 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import { Route, Routes } from 'react-router-dom';
+import HomePage from './pages/HomePage';
+import CalculatorPage from './pages/CalculatorPage';
+import VariablesPage from './pages/VariablesPage';
+import PricesPage from './pages/PricesPage';
+import { Container } from '@mui/material';
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    return (
+        <Container>
+            <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/calculator/:id" element={<CalculatorPage />} />
+                <Route path="/calculator/:id/variables" element={<VariablesPage />} />
+                <Route path="/calculator/:id/prices" element={<PricesPage />} />
+            </Routes>
+        </Container>
+    );
 }
 
 export default App;

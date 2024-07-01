@@ -1,23 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from '../api/axios';
 import PriceList from '../components/PriceList';
 import PriceForm from '../components/PriceForm';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { Typography, Box } from '@mui/material';
+import CalculatorMenu from "../components/CalculatorMenu";
 
 function PricesPage() {
   const { id } = useParams();
   const [prices, setPrices] = useState([]);
 
-  useEffect(() => {
-    fetchPrices();
-  }, [id]);
-
-  const fetchPrices = async () => {
+  const fetchPrices = useCallback(async () => {
     const response = await axios.get(`/calculator/${id}/price`);
     setPrices(response.data);
-  };
+  }, [id]);
+
+  useEffect(() => {
+    fetchPrices();
+  }, [fetchPrices]);
 
   const createPrice = async (price) => {
     await axios.post(`/calculator/${id}/price`, [price]);
@@ -49,12 +50,17 @@ function PricesPage() {
     );
   };
 
+  const deletePrice = async (priceId) => {
+    await axios.delete(`/calculator/${id}/price/${priceId}`);
+    fetchPrices();
+  };
+
   return (
       <Box>
+        <CalculatorMenu calculatorId={id} />
         <Typography variant="h4" gutterBottom>
-          Prices
+          Цены
         </Typography>
-        <PriceForm onSubmit={createPrice} />
         <DragDropContext onDragEnd={onDragEnd}>
           <Droppable droppableId="prices">
             {(provided) => (
@@ -68,7 +74,7 @@ function PricesPage() {
                                 {...provided.dragHandleProps}
                                 sx={{ marginBottom: 2, padding: 2, border: '1px solid #ccc', borderRadius: 1 }}
                             >
-                              <PriceList price={price} onSave={updatePrice} />
+                              <PriceList price={price} onSave={updatePrice} onDelete={deletePrice} />
                             </Box>
                         )}
                       </Draggable>
@@ -78,6 +84,7 @@ function PricesPage() {
             )}
           </Droppable>
         </DragDropContext>
+        <PriceForm onSubmit={createPrice} />
       </Box>
   );
 }

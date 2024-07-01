@@ -1,38 +1,31 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import axios from '../api/axios'; // Импортируйте настроенный экземпляр
+import React, { useState, useEffect, useCallback } from 'react';
+import {useParams} from 'react-router-dom';
+import axios from '../api/axios';
+import {Typography, Box} from '@mui/material';
+import CalculatorMenu from "../components/CalculatorMenu";
 
 function CalculatorPage() {
     const { id } = useParams();
     const [calculator, setCalculator] = useState(null);
 
-    useEffect(() => {
-        fetchCalculator();
-    }, [id]);
-
-    const fetchCalculator = async () => {
+    const fetchCalculator = useCallback(async () => {
         const response = await axios.get(`/calculator/${id}`);
         setCalculator(response.data);
-    };
+    }, [id]);
 
-    const updateCalculator = async (name) => {
-        await axios.patch(`/calculator/${id}`, { name });
+    useEffect(() => {
         fetchCalculator();
-    };
+    }, [fetchCalculator]);
+
+    if (!calculator) return <div>Loading...</div>;
 
     return (
-        <div>
-            {calculator && (
-                <>
-                    <h1>{calculator.name}</h1>
-                    <button onClick={() => updateCalculator(prompt('New name', calculator.name))}>Edit Name</button>
-                    <div>
-                        <Link to={`/calculator/${id}/variables`}>Edit Variables</Link>
-                        <Link to={`/calculator/${id}/prices`}>Edit Prices</Link>
-                    </div>
-                </>
-            )}
-        </div>
+        <Box>
+            <Typography variant="h4" gutterBottom>
+                {calculator.name}
+            </Typography>
+            <CalculatorMenu calculatorId={id} />
+        </Box>
     );
 }
 

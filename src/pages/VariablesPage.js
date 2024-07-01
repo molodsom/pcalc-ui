@@ -1,26 +1,32 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import {useParams} from 'react-router-dom';
 import axios from '../api/axios';
 import VariableList from '../components/VariableList';
 import VariableForm from '../components/VariableForm';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { Typography, Box } from '@mui/material';
+import {Typography, Box} from '@mui/material';
+import CalculatorMenu from "../components/CalculatorMenu";
 
 function VariablesPage() {
   const { id } = useParams();
   const [variables, setVariables] = useState([]);
+  const [maxOrder, setMaxOrder] = useState(0);
+
+  const fetchVariables = useCallback(async () => {
+    const response = await axios.get(`/calculator/${id}/variable`);
+    const fetchedVariables = response.data;
+    setVariables(fetchedVariables);
+    const maxOrderValue = fetchedVariables.reduce((max, variable) => Math.max(max, variable.order), 0);
+    setMaxOrder(maxOrderValue);
+  }, [id]);
 
   useEffect(() => {
     fetchVariables();
-  }, [id]);
-
-  const fetchVariables = async () => {
-    const response = await axios.get(`/calculator/${id}/variable`);
-    setVariables(response.data);
-  };
+  }, [fetchVariables]);
 
   const createVariable = async (variable) => {
-    await axios.post(`/calculator/${id}/variable`, [variable]);
+    const newVariable = { ...variable, order: maxOrder + 1 };
+    await axios.post(`/calculator/${id}/variable`, [newVariable]);
     fetchVariables();
   };
 
@@ -49,12 +55,19 @@ function VariablesPage() {
     );
   };
 
+  const deleteVariable = async (variableId) => {
+    await axios.delete(`/calculator/${id}/variable/${variableId}`);
+    fetchVariables();
+  };
+
   return (
       <Box>
         <Typography variant="h4" gutterBottom>
-          Variables
+          <CalculatorMenu calculatorId={id} />
         </Typography>
-        <VariableForm onSubmit={createVariable} />
+        <Typography variant="h4" gutterBottom>
+          Переменные
+        </Typography>
         <DragDropContext onDragEnd={onDragEnd}>
           <Droppable droppableId="variables">
             {(provided) => (
@@ -68,7 +81,7 @@ function VariablesPage() {
                                 {...provided.dragHandleProps}
                                 sx={{ marginBottom: 2, padding: 2, border: '1px solid #ccc', borderRadius: 1 }}
                             >
-                              <VariableList variable={variable} onSave={updateVariable} />
+                              <VariableList variable={variable} onSave={updateVariable} onDelete={deleteVariable} />
                             </Box>
                         )}
                       </Draggable>
@@ -78,6 +91,7 @@ function VariablesPage() {
             )}
           </Droppable>
         </DragDropContext>
+        <VariableForm onSubmit={createVariable} />
       </Box>
   );
 }

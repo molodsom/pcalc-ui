@@ -3,13 +3,15 @@ import { useParams } from 'react-router-dom';
 import axios from '../api/axios';
 import PriceList from '../components/PriceList';
 import PriceForm from '../components/PriceForm';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { Typography, Box } from '@mui/material';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { Typography, Box, Button } from '@mui/material';
 import CalculatorMenu from "../components/CalculatorMenu";
+import AddIcon from "@mui/icons-material/Add";
 
 function PricesPage() {
   const { id } = useParams();
   const [prices, setPrices] = useState([]);
+  const [isAdding, setIsAdding] = useState(false);
 
   const fetchPrices = useCallback(async () => {
     const response = await axios.get(`/calculator/${id}/price`);
@@ -21,14 +23,19 @@ function PricesPage() {
   }, [fetchPrices]);
 
   const createPrice = async (price) => {
-    await axios.post(`/calculator/${id}/price`, [price]);
+    await axios.post(`/calculator/${id}/price`, { ...price, order: getLastOrder() });
     fetchPrices();
+    setIsAdding(false);
   };
 
   const updatePriceOrder = async (prices) => {
     await axios.put(`/calculator/${id}/price`, prices);
     fetchPrices();
   };
+
+  const getLastOrder = () => {
+    return prices.reduce((max, item) => Math.max(max, item.order || 0), 0) + 1;
+  }
 
   const onDragEnd = (result) => {
     if (!result.destination) return;
@@ -58,7 +65,7 @@ function PricesPage() {
   return (
       <Box>
         <CalculatorMenu calculatorId={id} />
-        <Typography variant="h4" gutterBottom>
+        <Typography variant="h4" gutterBottom mt={2} mb={2}>
           Цены
         </Typography>
         <DragDropContext onDragEnd={onDragEnd}>
@@ -84,7 +91,11 @@ function PricesPage() {
             )}
           </Droppable>
         </DragDropContext>
-        <PriceForm onSubmit={createPrice} />
+        {isAdding ? (
+            <PriceForm calculatorId={id} onSave={createPrice} onCancel={() => setIsAdding(false)} />
+        ) : (
+            <Button startIcon={<AddIcon />} variant="contained" onClick={() => setIsAdding(true)}>Добавить</Button>
+        )}
       </Box>
   );
 }

@@ -1,16 +1,18 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import {useParams} from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import axios from '../api/axios';
 import VariableList from '../components/VariableList';
 import VariableForm from '../components/VariableForm';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import {Typography, Box} from '@mui/material';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { Typography, Box, Button } from '@mui/material';
 import CalculatorMenu from "../components/CalculatorMenu";
+import AddIcon from "@mui/icons-material/Add";
 
 function VariablesPage() {
   const { id } = useParams();
   const [variables, setVariables] = useState([]);
   const [maxOrder, setMaxOrder] = useState(0);
+  const [isAdding, setIsAdding] = useState(false);
 
   const fetchVariables = useCallback(async () => {
     const response = await axios.get(`/calculator/${id}/variable`);
@@ -25,8 +27,19 @@ function VariablesPage() {
   }, [fetchVariables]);
 
   const createVariable = async (variable) => {
-    const newVariable = { ...variable, order: maxOrder + 1 };
+    const newVariable = { ...variable, order: maxOrder + 1, calculator_id: id };
     await axios.post(`/calculator/${id}/variable`, [newVariable]);
+    fetchVariables();
+    setIsAdding(false);
+  };
+
+  const updateVariable = async (updatedVariable) => {
+    await axios.patch(`/calculator/${id}/variable/${updatedVariable._id}`, updatedVariable);
+    fetchVariables();
+  };
+
+  const deleteVariable = async (variableId) => {
+    await axios.delete(`/calculator/${id}/variable/${variableId}`);
     fetchVariables();
   };
 
@@ -44,28 +57,25 @@ function VariablesPage() {
       item.order = index + 1;
     });
     setVariables(items);
-    updateVariableOrder(items);
+    updateVariableOrder(items).then(_ => {});
   };
 
-  const updateVariable = (updatedVariable) => {
-    setVariables((prevVariables) =>
-        prevVariables.map((variable) =>
-            variable._id === updatedVariable._id ? updatedVariable : variable
-        )
-    );
-  };
-
-  const deleteVariable = async (variableId) => {
-    await axios.delete(`/calculator/${id}/variable/${variableId}`);
-    fetchVariables();
+  const initialVariable = {
+    tag_name: '',
+    name: '',
+    data_type: 'str',
+    default_value: '',
+    widget: '',
+    required: false,
+    is_output: false,
+    formula: '',
+    choices: []
   };
 
   return (
       <Box>
-        <Typography variant="h4" gutterBottom>
-          <CalculatorMenu calculatorId={id} />
-        </Typography>
-        <Typography variant="h4" gutterBottom>
+        <CalculatorMenu calculatorId={id} />
+        <Typography variant="h4" gutterBottom mt={2} mb={2}>
           Переменные
         </Typography>
         <DragDropContext onDragEnd={onDragEnd}>
@@ -91,7 +101,16 @@ function VariablesPage() {
             )}
           </Droppable>
         </DragDropContext>
-        <VariableForm onSubmit={createVariable} />
+        {isAdding ? (
+            <VariableForm
+                variable={initialVariable}
+                calculatorId={id}
+                onSave={createVariable}
+                onCancel={() => setIsAdding(false)}
+            />
+        ) : (
+            <Button startIcon={<AddIcon />} variant="contained" onClick={() => setIsAdding(true)}>Добавить</Button>
+        )}
       </Box>
   );
 }

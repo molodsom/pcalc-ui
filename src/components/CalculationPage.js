@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from '../api/axios';
 import CalculationForm from '../components/CalculationForm';
-import { Box, Typography, Button, FormControlLabel, Checkbox } from '@mui/material';
+import {Box, Typography, Button, FormControlLabel, Checkbox, FormControl, Grid} from '@mui/material';
 import CalculatorMenu from "./CalculatorMenu";
 
 function CalculationPage() {
@@ -10,7 +10,7 @@ function CalculationPage() {
     const [variables, setVariables] = useState([]);
     const [values, setValues] = useState({});
     const [results, setResults] = useState({});
-    const [asHtml, setAsHtml] = useState(false);
+    const [asHtml, setAsHtml] = useState(true);
     const [htmlResult, setHtmlResult] = useState("");
     const [errors, setErrors] = useState({});
 
@@ -19,7 +19,11 @@ function CalculationPage() {
             const response = await axios.get(`/calculator/${id}/variable`);
             setVariables(response.data);
             const initialValues = response.data.reduce((acc, variable) => {
-                acc[variable.tag_name] = variable.default_value;
+                if (variable.data_type === 'bool') {
+                    acc[variable.tag_name] = variable.default_value ?? false;
+                } else {
+                    acc[variable.tag_name] = variable.default_value ?? '';
+                }
                 return acc;
             }, {});
             setValues(initialValues);
@@ -38,11 +42,12 @@ function CalculationPage() {
     const validate = () => {
         const newErrors = {};
         variables.forEach((variable) => {
-            if (variable.required && !values[variable.tag_name]) {
-                newErrors[variable.tag_name] = 'This field is required';
+            if (variable.required && !values[variable.tag_name] && values[variable.tag_name] !== false) {
+                newErrors[variable.tag_name] = 'Это поле обязательное';
             }
         });
         setErrors(newErrors);
+        console.log(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
@@ -72,21 +77,30 @@ function CalculationPage() {
                 onChange={handleChange}
                 errors={errors}
             />
-            <FormControlLabel
-                control={
-                    <Checkbox
-                        checked={asHtml}
-                        onChange={(e) => setAsHtml(e.target.checked)}
+            <Box container mt={2} spacing={2}>
+                <Box>
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+
+                                checked={asHtml}
+                                onChange={(e) => setAsHtml(e.target.checked)}
+                            />
+                        }
+                        label="HTML"
                     />
-                }
-                label="Return as HTML"
-            />
-            <Button variant="contained" color="primary" onClick={handleCalculate} sx={{ marginTop: 2 }}>
-                Calculate
-            </Button>
-            <Box sx={{ marginTop: 4 }}>
+                </Box>
+                <Box>
+                    <FormControl>
+                        <Button variant="contained" color="primary" onClick={handleCalculate}>
+                            Рассчитать
+                        </Button>
+                    </FormControl>
+                </Box>
+            </Box>
+            <Box sx={{ mt: 4, mb: 4 }}>
                 <Typography variant="h5" gutterBottom>
-                    Results
+                    Результаты
                 </Typography>
                 {asHtml ? (
                     <div dangerouslySetInnerHTML={{ __html: htmlResult }} />

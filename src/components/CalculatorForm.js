@@ -11,15 +11,16 @@ function CalculatorForm({ onSubmit }) {
     };
 
     return (
-        <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', gap: 2, marginBottom: 2 }}>
+        <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', gap: 2, marginTop: 2 }}>
             <TextField
-                label="Calculator Name"
+                label="Имя калькулятора"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
+                fullWidth
             />
             <Button variant="contained" color="primary" type="submit">
-                Add Calculator
+                Сохранить
             </Button>
         </Box>
     );

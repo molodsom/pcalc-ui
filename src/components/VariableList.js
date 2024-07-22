@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, IconButton } from '@mui/material';
+import {Box, IconButton, Typography} from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import VariableForm from './VariableForm';
@@ -43,13 +43,16 @@ function VariableList({ variable, onSave, onDelete }) {
                 />
             ) : (
                 <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                    <Box sx={{ flex: 1 }}>{variable.name}</Box>
-                    <Box sx={{ flex: 1 }}><strong>{variable.tag_name}{variable.required ? '*' : ''}</strong></Box>
-                    <Box sx={{ flex: 1 }}>{variable.description}</Box>
-                    <Box sx={{ flex: 1 }}>{variable.data_type}</Box>
+                    <Box sx={{ flex: 1 }}>
+                        <strong>{variable.tag_name}{variable.required ? '*' : ''}</strong>
+                        {(variable.name) && <Box><Typography variant={"caption"}>{variable.name}</Typography></Box>}
+                    </Box>
+                    <Box sx={{ flex: 1 }}>
+                        {variable.data_type}
+                        {(variable.widget) && <Box><Typography variant={"caption"}>{variable.widget}</Typography></Box>}
+                    </Box>
                     <Box sx={{ flex: 1 }}>{displayValue(variable.default_value)}</Box>
                     <Box sx={{ flex: 1 }}>{variable.formula}</Box>
-                    <Box sx={{ flex: 1 }}>{variable.widget}</Box>
                     <Box sx={{ flex: 1 }}>{variable.is_output ? 'Вывод' : ''}</Box>
                     <IconButton onClick={() => setIsEditing(true)} size="small">
                         <EditIcon />

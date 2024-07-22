@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextField, Box, FormControl, Checkbox, FormControlLabel, Autocomplete, MenuItem } from '@mui/material';
+import { TextField, Box, FormControl, Checkbox, FormControlLabel, Autocomplete } from '@mui/material';
 
 function CalculationForm({ variables, values, onChange, errors }) {
     return (

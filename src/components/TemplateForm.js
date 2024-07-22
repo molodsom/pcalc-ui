@@ -77,7 +77,7 @@ function TemplateForm() {
             </Typography>
             <Box mb={2}>
                 <Alert variant="outlined" severity="info">
-                    Используйте HTML-теги. Для вставки значений переменных используйте формат <Box component="span" sx={{ fontFamily: 'monospace', backgroundColor: '#f5f5f5', padding: '0 4px', borderRadius: '4px' }}>{'{{ variable_name }}'}</Box>
+                    Для вставки значений переменных используйте формат <Box component="span" sx={{ fontFamily: 'monospace', backgroundColor: '#f5f5f5', padding: '0 4px', borderRadius: '4px' }}>{'{{ variable_name }}'}</Box>
                 </Alert>
             </Box>
             <TextField

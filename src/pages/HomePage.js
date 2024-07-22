@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from '../api/axios';
 import CalculatorList from '../components/CalculatorList';
 import CalculatorForm from '../components/CalculatorForm';
-import { Typography, Box, Paper, Container, Button } from '@mui/material';
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import { Typography, Box, Container, Button } from '@mui/material';
 import AddIcon from "@mui/icons-material/Add";
 
 function HomePage() {

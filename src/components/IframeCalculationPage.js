@@ -2,16 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from '../api/axios';
 import CalculationForm from '../components/CalculationForm';
-import {Box, Typography, Button, FormControlLabel, Checkbox, FormControl} from '@mui/material';
-import CalculatorMenu from "./CalculatorMenu";
+import { Box, Button, FormControl } from '@mui/material';
 
-function CalculationPage() {
+function IframeCalculationPage() {
     const { id } = useParams();
     const [variables, setVariables] = useState([]);
     const [values, setValues] = useState({});
-    const [results, setResults] = useState({});
-    const [asHtml, setAsHtml] = useState(true);
-    const [htmlResult, setHtmlResult] = useState("");
     const [errors, setErrors] = useState({});
 
     useEffect(() => {
@@ -56,21 +52,20 @@ function CalculationPage() {
             return;
         }
         const response = await axios.post(`/calculator/${id}`, values, {
-            params: { as_html: asHtml },
+            params: { as_html: false },
         });
-        if (asHtml) {
-            setHtmlResult(response.data.html);
-        } else {
-            setResults(response.data);
-        }
+        const jsonResult = response.data;
+
+        const htmlResponse = await axios.post(`/calculator/${id}`, values, {
+            params: { as_html: true },
+        });
+        const htmlResult = htmlResponse.data.html;
+
+        window.parent.postMessage({ type: 'result', data: { json: jsonResult, html: htmlResult } }, '*');
     };
 
     return (
-        <Box>
-            <CalculatorMenu calculatorId={id} />
-            <Typography variant="h4" gutterBottom>
-                Расчёт
-            </Typography>
+        <Box mt={2}>
             <CalculationForm
                 variables={variables}
                 values={values}
@@ -79,18 +74,6 @@ function CalculationPage() {
             />
             <Box container mt={2} spacing={2}>
                 <Box>
-                    <FormControlLabel
-                        control={
-                            <Checkbox
-
-                                checked={asHtml}
-                                onChange={(e) => setAsHtml(e.target.checked)}
-                            />
-                        }
-                        label="HTML"
-                    />
-                </Box>
-                <Box>
                     <FormControl>
                         <Button variant="contained" color="primary" onClick={handleCalculate}>
                             Рассчитать
@@ -98,18 +81,8 @@ function CalculationPage() {
                     </FormControl>
                 </Box>
             </Box>
-            <Box sx={{ mt: 4, mb: 4 }}>
-                <Typography variant="h5" gutterBottom>
-                    Результаты
-                </Typography>
-                {asHtml ? (
-                    <div dangerouslySetInnerHTML={{ __html: htmlResult }} />
-                ) : (
-                    <pre>{JSON.stringify(results, null, 2)}</pre>
-                )}
-            </Box>
         </Box>
     );
 }
 
-export default CalculationPage;
+export default IframeCalculationPage;

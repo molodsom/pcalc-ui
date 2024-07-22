@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, IconButton } from '@mui/material';
+import {Box, IconButton, Typography} from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PriceForm from './PriceForm';
@@ -24,10 +24,12 @@ function PriceList({ price, onSave, onDelete }) {
                 />
             ) : (
                 <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                    <Box sx={{ flex: 1 }}>{price.description}</Box>
-                    <Box sx={{ flex: 1 }}>{price.tag_name}</Box>
-                    <Box sx={{ flex: 1 }}>{price.price}</Box>
+                    <Box sx={{ flex: 1 }}>
+                        <Box>{price.description}</Box>
+                        <Box><Typography variant={"caption"}>{price.tag_name}</Typography></Box>
+                    </Box>
                     <Box sx={{ flex: 1 }}>{JSON.stringify(price.extra)}</Box>
+                    <Box sx={{ flex: 1, textAlign: "center" }}>{price.price}</Box>
                     <IconButton onClick={() => setIsEditing(true)} size="small">
                         <EditIcon />
                     </IconButton>

@@ -10,7 +10,7 @@ function VariableList({ variable, onSave, onDelete }) {
     const [open, setOpen] = useState(false);
 
     const handleSave = async (formData) => {
-        await onSave({ ...formData, _id: variable._id }); // Ensure _id is included for update
+        await onSave({ ...formData, _id: variable._id, order: variable.order });
         setIsEditing(false);
     };
 

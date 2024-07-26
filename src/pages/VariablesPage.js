@@ -17,6 +17,7 @@ function VariablesPage() {
   const fetchVariables = useCallback(async () => {
     const response = await axios.get(`/calculator/${id}/variable`);
     const fetchedVariables = response.data;
+    fetchedVariables.sort((a, b) => a.order - b.order);
     setVariables(fetchedVariables);
     const maxOrderValue = fetchedVariables.reduce((max, variable) => Math.max(max, variable.order), 0);
     setMaxOrder(maxOrderValue);
@@ -69,7 +70,8 @@ function VariablesPage() {
     required: false,
     is_output: false,
     formula: '',
-    choices: []
+    choices: [],
+    order: maxOrder + 1
   };
 
   return (

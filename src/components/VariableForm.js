@@ -24,7 +24,8 @@ const VariableForm = ({ variable = {}, calculatorId, onSave, onDelete, onCancel 
         required: false,
         is_output: false,
         formula: '',
-        choices: []
+        choices: [],
+        order: variable.order || 0
     };
 
     const [formData, setFormData] = useState(initialFormState);
@@ -42,7 +43,8 @@ const VariableForm = ({ variable = {}, calculatorId, onSave, onDelete, onCancel 
                 required: variable.required || false,
                 is_output: variable.is_output || false,
                 formula: variable.formula || '',
-                choices: variable.choices || []
+                choices: variable.choices || [],
+                order: variable.order || 0
             });
         } else {
             setFormData(initialFormState);

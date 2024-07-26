@@ -49,12 +49,9 @@ function PricesPage() {
     updatePriceOrder(items);
   };
 
-  const updatePrice = (updatedPrice) => {
-    setPrices((prevPrices) =>
-        prevPrices.map((price) =>
-            price._id === updatedPrice._id ? updatedPrice : price
-        )
-    );
+  const updatePrice = async (updatedPrice) => {
+    await axios.patch(`/calculator/${id}/price/${updatedPrice._id}`, updatedPrice);
+    fetchPrices();
   };
 
   const deletePrice = async (priceId) => {

@@ -15,6 +15,7 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
+import axios from '../api/axios';
 
 const conditionOptions = [
     { value: '__gte', label: '>= (больше или равно)' },
@@ -72,7 +73,18 @@ function PriceForm({ price = {}, calculatorId, onSave, onDelete, onCancel }) {
             return;
         }
         setError('');
-        onSave(formData);
+
+        try {
+            if (price._id) {
+                await axios.patch(`/calculator/${calculatorId}/price/${price._id}`, formData);
+            } else {
+                await axios.post(`/calculator/${calculatorId}/price`, formData);
+            }
+            onSave(formData);
+        } catch (err) {
+            console.error('Error saving price:', err);
+            setError('Error saving price. Please try again.');
+        }
     };
 
     return (

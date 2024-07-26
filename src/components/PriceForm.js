@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     TextField,
     Button,
@@ -15,7 +15,6 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
-import axios from '../api/axios';
 
 const conditionOptions = [
     { value: '__gte', label: '>= (больше или равно)' },
@@ -28,38 +27,40 @@ const conditionOptions = [
     { value: '', label: 'без условия' },
 ];
 
+const numericConditions = ['__gte', '__gt', '__lte', '__lt'];
+
 function PriceForm({ price = {}, calculatorId, onSave, onDelete, onCancel }) {
     const [error, setError] = useState('');
-    const [formData, setFormData] = useState({ ...price, extra: price.extra || {} });
+    const [formData, setFormData] = useState({
+        ...price,
+        extra: Array.isArray(price.extra) ? price.extra : Object.entries(price.extra || {}).map(([key, value]) => ({ key, value })),
+    });
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleExtraChange = (key, value, condition) => {
+    const handleExtraChange = (index, key, value, condition) => {
+        const newExtra = [...formData.extra];
         const newKey = condition ? `${key}${condition}` : key;
+        const parsedValue = numericConditions.includes(condition) ? Number(value) : value;
+        newExtra[index] = { key: newKey, value: parsedValue };
         setFormData((prev) => ({
             ...prev,
-            extra: {
-                ...prev.extra,
-                [newKey]: value,
-            },
+            extra: newExtra,
         }));
     };
 
     const handleAddExtra = () => {
         setFormData((prev) => ({
             ...prev,
-            extra: {
-                ...prev.extra,
-                '': '',
-            },
+            extra: [...prev.extra, { key: `newKey${Date.now()}`, value: '' }],
         }));
     };
 
-    const handleRemoveExtra = (key) => {
-        const { [key]: _, ...newExtra } = formData.extra;
+    const handleRemoveExtra = (index) => {
+        const newExtra = formData.extra.filter((_, i) => i !== index);
         setFormData((prev) => ({
             ...prev,
             extra: newExtra,
@@ -74,18 +75,22 @@ function PriceForm({ price = {}, calculatorId, onSave, onDelete, onCancel }) {
         }
         setError('');
 
-        try {
-            if (price._id) {
-                await axios.patch(`/calculator/${calculatorId}/price/${price._id}`, formData);
-            } else {
-                await axios.post(`/calculator/${calculatorId}/price`, formData);
-            }
-            onSave(formData);
-        } catch (err) {
-            console.error('Error saving price:', err);
-            setError('Error saving price. Please try again.');
-        }
+        const extraObject = formData.extra.reduce((acc, { key, value }) => {
+            acc[key] = value;
+            return acc;
+        }, {});
+
+        const formDataToSend = { ...formData, extra: extraObject };
+
+        onSave(formDataToSend);
     };
+
+    useEffect(() => {
+        setFormData({
+            ...price,
+            extra: Array.isArray(price.extra) ? price.extra : Object.entries(price.extra || {}).map(([key, value]) => ({ key, value })),
+        });
+    }, [price]);
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -117,9 +122,9 @@ function PriceForm({ price = {}, calculatorId, onSave, onDelete, onCancel }) {
                 />
             </Box>
             <Typography variant="h6">Дополнительные свойства</Typography>
-            {Object.keys(formData.extra).map((key, index) => {
-                const match = key.match(/(.*?)(__(gte|gt|lte|lt|eq|ne|in))?$/);
-                const field = match ? match[1] : key;
+            {formData.extra.map((extraItem, index) => {
+                const match = extraItem.key.match(/(.*?)(__(gte|gt|lte|lt|eq|ne|in))?$/);
+                const field = match ? match[1] : extraItem.key;
                 const condition = match && match[2] ? match[2] : '';
 
                 return (
@@ -129,9 +134,8 @@ function PriceForm({ price = {}, calculatorId, onSave, onDelete, onCancel }) {
                             value={field}
                             onChange={(e) => {
                                 const newField = e.target.value;
-                                const value = formData.extra[key];
-                                handleRemoveExtra(key);
-                                handleExtraChange(newField, value, condition);
+                                const value = extraItem.value;
+                                handleExtraChange(index, newField, value, condition);
                             }}
                             size="small"
                             sx={{ flex: 1 }}
@@ -143,9 +147,8 @@ function PriceForm({ price = {}, calculatorId, onSave, onDelete, onCancel }) {
                                 value={condition || ''}
                                 onChange={(e) => {
                                     const newCondition = e.target.value;
-                                    const value = formData.extra[key];
-                                    handleRemoveExtra(key);
-                                    handleExtraChange(field, value, newCondition);
+                                    const value = extraItem.value;
+                                    handleExtraChange(index, field, value, newCondition);
                                 }}
                             >
                                 {conditionOptions.map((option) => (
@@ -160,20 +163,17 @@ function PriceForm({ price = {}, calculatorId, onSave, onDelete, onCancel }) {
                                 multiple
                                 freeSolo
                                 options={[]}
-                                value={Array.isArray(formData.extra[key]) ? formData.extra[key] : []}
-                                onChange={(event, newValue) => handleExtraChange(field, newValue, condition)}
+                                value={Array.isArray(extraItem.value) ? extraItem.value : []}
+                                onChange={(event, newValue) => handleExtraChange(index, field, newValue, condition)}
                                 renderTags={(value, getTagProps) =>
-                                    value.map((option, index) => {
-                                        const { key, ...tagProps } = getTagProps({ index });
-                                        return (
-                                            <Chip
-                                                key={key}  // передача ключа напрямую
-                                                variant="outlined"
-                                                label={option}
-                                                {...tagProps}
-                                            />
-                                        );
-                                    })
+                                    value.map((option, index) => (
+                                        <Chip
+                                            key={index}
+                                            variant="outlined"
+                                            label={option}
+                                            {...getTagProps({ index })}
+                                        />
+                                    ))
                                 }
                                 renderInput={(params) => (
                                     <TextField
@@ -186,17 +186,16 @@ function PriceForm({ price = {}, calculatorId, onSave, onDelete, onCancel }) {
                                 )}
                                 sx={{ flex: 1 }}
                             />
-
                         ) : (
                             <TextField
                                 label="Значение"
-                                value={formData.extra[key]}
-                                onChange={(e) => handleExtraChange(field, e.target.value, condition)}
+                                value={extraItem.value}
+                                onChange={(e) => handleExtraChange(index, field, e.target.value, condition)}
                                 size="small"
                                 sx={{ flex: 1 }}
                             />
                         )}
-                        <IconButton onClick={() => handleRemoveExtra(key)}>
+                        <IconButton onClick={() => handleRemoveExtra(index)}>
                             <RemoveIcon />
                         </IconButton>
                     </Box>

@@ -31,13 +31,22 @@ const numericConditions = ['__gte', '__gt', '__lte', '__lt'];
 
 function PriceForm({ price = {}, calculatorId, onSave, onDelete, onCancel }) {
     const [error, setError] = useState('');
-    const [formData, setFormData] = useState({ ...price, extra: price.extra ? Object.entries(price.extra).map(([key, value]) => ({ key, value })) : [] });
+    const [formData, setFormData] = useState({
+        ...price,
+        extra: price.extra ? Object.entries(price.extra).map(([key, value]) => ({ key, value })) : [],
+        description: price.description || '',
+        tag_name: price.tag_name || '',
+        price: price.price || '',
+    });
 
     useEffect(() => {
         if (price && price.extra) {
             setFormData({
                 ...price,
                 extra: Object.entries(price.extra).map(([key, value]) => ({ key, value })),
+                description: price.description || '',
+                tag_name: price.tag_name || '',
+                price: price.price || '',
             });
         }
     }, [price]);

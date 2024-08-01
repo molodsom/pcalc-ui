@@ -25,7 +25,7 @@ function IframeCalculationPage() {
             setValues(initialValues);
         };
 
-        fetchVariables();
+        fetchVariables().then(() => {});
     }, [id]);
 
     const handleChange = (tag_name, value) => {
@@ -72,14 +72,12 @@ function IframeCalculationPage() {
                 onChange={handleChange}
                 errors={errors}
             />
-            <Box container mt={2} spacing={2}>
-                <Box>
-                    <FormControl>
-                        <Button variant="contained" color="primary" onClick={handleCalculate}>
-                            Рассчитать
-                        </Button>
-                    </FormControl>
-                </Box>
+            <Box mt={2} spacing={2} display="flex" justifyContent="center">
+                <FormControl>
+                    <Button variant="contained" color="primary" onClick={handleCalculate}>
+                        Рассчитать
+                    </Button>
+                </FormControl>
             </Box>
         </Box>
     );

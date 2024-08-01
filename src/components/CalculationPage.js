@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from '../api/axios';
 import CalculationForm from '../components/CalculationForm';
-import {Box, Typography, Button, FormControlLabel, Checkbox, FormControl} from '@mui/material';
+import { Box, Typography, Button, FormControlLabel, Checkbox } from '@mui/material';
 import CalculatorMenu from "./CalculatorMenu";
 
 function CalculationPage() {
@@ -29,7 +29,7 @@ function CalculationPage() {
             setValues(initialValues);
         };
 
-        fetchVariables();
+        fetchVariables().then(() => {});
     }, [id]);
 
     const handleChange = (tag_name, value) => {
@@ -47,7 +47,6 @@ function CalculationPage() {
             }
         });
         setErrors(newErrors);
-        console.log(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
@@ -77,26 +76,19 @@ function CalculationPage() {
                 onChange={handleChange}
                 errors={errors}
             />
-            <Box container mt={2} spacing={2}>
-                <Box>
-                    <FormControlLabel
-                        control={
-                            <Checkbox
-
-                                checked={asHtml}
-                                onChange={(e) => setAsHtml(e.target.checked)}
-                            />
-                        }
-                        label="HTML"
-                    />
-                </Box>
-                <Box>
-                    <FormControl>
-                        <Button variant="contained" color="primary" onClick={handleCalculate}>
-                            Рассчитать
-                        </Button>
-                    </FormControl>
-                </Box>
+            <Box mt={2} spacing={2} display="flex" justifyContent="space-between">
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            checked={asHtml}
+                            onChange={(e) => setAsHtml(e.target.checked)}
+                        />
+                    }
+                    label="HTML"
+                />
+                <Button variant="contained" color="primary" onClick={handleCalculate}>
+                    Рассчитать
+                </Button>
             </Box>
             <Box sx={{ mt: 4, mb: 4 }}>
                 <Typography variant="h5" gutterBottom>

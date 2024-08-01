@@ -20,6 +20,7 @@ const VariableForm = ({ variable = {}, calculatorId, onSave, onDelete, onCancel 
         name: '',
         data_type: 'str',
         default_value: '',
+        placeholder: '',
         widget: '',
         required: false,
         is_output: false,
@@ -39,6 +40,7 @@ const VariableForm = ({ variable = {}, calculatorId, onSave, onDelete, onCancel 
                 name: variable.name || '',
                 data_type: variable.data_type || 'str',
                 default_value: variable.default_value || '',
+                placeholder: variable.placeholder || '',
                 widget: variable.widget || '',
                 required: variable.required || false,
                 is_output: variable.is_output || false,
@@ -127,6 +129,14 @@ const VariableForm = ({ variable = {}, calculatorId, onSave, onDelete, onCancel 
                         label="По умолчанию"
                         name="default_value"
                         value={formData.default_value}
+                        onChange={handleChange}
+                        size="small"
+                        sx={{ flex: 1 }}
+                    />
+                    <TextField
+                        label="Подсказка"
+                        name="placeholder"
+                        value={formData.placeholder}
                         onChange={handleChange}
                         size="small"
                         sx={{ flex: 1 }}

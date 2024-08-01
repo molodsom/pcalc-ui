@@ -14,13 +14,15 @@ function CalculationForm({ variables, values, onChange, errors }) {
                                 options={variable.choices || []}
                                 value={values[variable.tag_name] || ''}
                                 onChange={(event, newValue) => onChange(variable.tag_name, newValue)}
+                                isOptionEqualToValue={(option, value) => option === value}
                                 renderInput={(params) => (
                                     <TextField
                                         {...params}
                                         label={variable.name}
                                         variant="outlined"
                                         error={!!errors[variable.tag_name]}
-                                        helperText={errors[variable.tag_name]}
+                                        helperText={errors[variable.tag_name] || ''}
+                                        placeholder={variable.placeholder || ''}
                                     />
                                 )}
                             />
@@ -35,7 +37,8 @@ function CalculationForm({ variables, values, onChange, errors }) {
                                         variant="outlined"
                                         fullWidth
                                         error={!!errors[variable.tag_name]}
-                                        helperText={errors[variable.tag_name]}
+                                        helperText={errors[variable.tag_name] || ''}
+                                        placeholder={variable.placeholder || ''}
                                     />
                                 )}
                                 {variable.data_type === 'int' && (
@@ -48,7 +51,8 @@ function CalculationForm({ variables, values, onChange, errors }) {
                                         variant="outlined"
                                         fullWidth
                                         error={!!errors[variable.tag_name]}
-                                        helperText={errors[variable.tag_name]}
+                                        helperText={errors[variable.tag_name] || ''}
+                                        placeholder={variable.placeholder || ''}
                                     />
                                 )}
                                 {variable.data_type === 'float' && (
@@ -61,21 +65,20 @@ function CalculationForm({ variables, values, onChange, errors }) {
                                         variant="outlined"
                                         fullWidth
                                         error={!!errors[variable.tag_name]}
-                                        helperText={errors[variable.tag_name]}
+                                        helperText={errors[variable.tag_name] || ''}
+                                        placeholder={variable.placeholder || ''}
                                     />
                                 )}
                                 {variable.data_type === 'bool' && (
                                     <FormControlLabel
                                         control={
                                             <Checkbox
-                                                sx={{p: 0, pl: 1, pr: 1}}
+                                                sx={{ p: 0, pl: 1, pr: 1 }}
                                                 checked={values[variable.tag_name] ?? false}
                                                 onChange={(e) => onChange(variable.tag_name, e.target.checked)}
                                             />
                                         }
                                         label={variable.name}
-                                        error={!!errors[variable.tag_name]}
-                                        helperText={errors[variable.tag_name]}
                                     />
                                 )}
                             </>

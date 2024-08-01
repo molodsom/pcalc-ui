@@ -31,10 +31,16 @@ const numericConditions = ['__gte', '__gt', '__lte', '__lt'];
 
 function PriceForm({ price = {}, calculatorId, onSave, onDelete, onCancel }) {
     const [error, setError] = useState('');
-    const [formData, setFormData] = useState({
-        ...price,
-        extra: Array.isArray(price.extra) ? price.extra : Object.entries(price.extra || {}).map(([key, value]) => ({ key, value })),
-    });
+    const [formData, setFormData] = useState({ ...price, extra: price.extra ? Object.entries(price.extra).map(([key, value]) => ({ key, value })) : [] });
+
+    useEffect(() => {
+        if (price && price.extra) {
+            setFormData({
+                ...price,
+                extra: Object.entries(price.extra).map(([key, value]) => ({ key, value })),
+            });
+        }
+    }, [price]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -55,7 +61,7 @@ function PriceForm({ price = {}, calculatorId, onSave, onDelete, onCancel }) {
     const handleAddExtra = () => {
         setFormData((prev) => ({
             ...prev,
-            extra: [...prev.extra, { key: `newKey${Date.now()}`, value: '' }],
+            extra: [...prev.extra, { key: '', value: '' }],
         }));
     };
 
@@ -84,13 +90,6 @@ function PriceForm({ price = {}, calculatorId, onSave, onDelete, onCancel }) {
 
         onSave(formDataToSend);
     };
-
-    useEffect(() => {
-        setFormData({
-            ...price,
-            extra: Array.isArray(price.extra) ? price.extra : Object.entries(price.extra || {}).map(([key, value]) => ({ key, value })),
-        });
-    }, [price]);
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>

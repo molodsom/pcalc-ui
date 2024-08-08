@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from '../api/axios';
 import CalculationForm from '../components/CalculationForm';
 import { Box, Button, FormControl } from '@mui/material';
+import useAxios from "../api/useAxios";
 
 function IframeCalculationPage() {
+    const axios = useAxios();
     const { id } = useParams();
     const [variables, setVariables] = useState([]);
     const [values, setValues] = useState({});

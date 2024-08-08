@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {useParams} from 'react-router-dom';
-import axios from '../api/axios';
 import {Typography, Box} from '@mui/material';
 import CalculatorMenu from "../components/CalculatorMenu";
+import useAxios from "../api/useAxios";
 
 function CalculatorPage() {
+    const axios = useAxios();
     const { id } = useParams();
     const [calculator, setCalculator] = useState(null);
 

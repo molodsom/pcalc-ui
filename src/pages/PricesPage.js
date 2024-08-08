@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from '../api/axios';
 import PriceList from '../components/PriceList';
 import PriceForm from '../components/PriceForm';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { Typography, Box, Button } from '@mui/material';
 import CalculatorMenu from "../components/CalculatorMenu";
 import AddIcon from "@mui/icons-material/Add";
+import useAxios from "../api/useAxios";
 
 function PricesPage() {
+  const axios = useAxios();
   const { id } = useParams();
   const [prices, setPrices] = useState([]);
   const [isAdding, setIsAdding] = useState(false);

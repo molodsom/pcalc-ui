@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from '../api/axios';
 import { useParams } from 'react-router-dom';
 import {
     Box,
@@ -12,8 +11,10 @@ import {
 } from '@mui/material';
 import CalculatorMenu from "./CalculatorMenu";
 import SaveIcon from "@mui/icons-material/Save";
+import useAxios from "../api/useAxios";
 
 function TemplateForm() {
+    const axios = useAxios();
     const { id } = useParams();
     const [html, setHtml] = useState('');
     const [templateId, setTemplateId] = useState(null);

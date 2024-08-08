@@ -1,21 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import axios from '../api/axios';
 import CalculatorList from '../components/CalculatorList';
 import CalculatorForm from '../components/CalculatorForm';
 import { Typography, Box, Container, Button } from '@mui/material';
 import AddIcon from "@mui/icons-material/Add";
+import useAxios from "../api/useAxios";
 
 function HomePage() {
+    const axios = useAxios();
     const [calculators, setCalculators] = useState([]);
     const [isAdding, setIsAdding] = useState(false);
 
     useEffect(() => {
-        fetchCalculators();
+        fetchCalculators().then(r => {});
     }, []);
 
     const fetchCalculators = async () => {
         const response = await axios.get('/calculator');
-        setCalculators(response.data);
+        if (response) {
+            setCalculators(response.data);
+        }
     };
 
     const createCalculator = async (name) => {

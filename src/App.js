@@ -1,15 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import CalculatorPage from './pages/CalculatorPage';
 import VariablesPage from './pages/VariablesPage';
 import PricesPage from './pages/PricesPage';
-import CalculationPage from "./components/CalculationPage";
-import TemplateForm from "./components/TemplateForm";
-import IframeCalculationPage from "./components/IframeCalculationPage";
-import Layout from './components/Layout'; // Импортируем наш компонент Layout
+import CalculationPage from './components/CalculationPage';
+import TemplateForm from './components/TemplateForm';
+import IframeCalculationPage from './components/IframeCalculationPage';
+import Layout from './components/Layout';
+import AuthDialog from './components/AuthDialog';
 
 function App() {
+    const [authError, setAuthError] = useState(false);
+
     return (
         <Layout>
             <Routes>
@@ -21,6 +24,7 @@ function App() {
                 <Route path="/calculator/:id/prices" element={<PricesPage />} />
                 <Route path="/calculator/:id/template" element={<TemplateForm />} />
             </Routes>
+            <AuthDialog open={authError} onClose={() => setAuthError(false)} />
         </Layout>
     );
 }

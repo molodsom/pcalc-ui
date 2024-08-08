@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from '../api/axios';
 import CalculationForm from '../components/CalculationForm';
 import { Box, Typography, Button, FormControlLabel, Checkbox } from '@mui/material';
 import CalculatorMenu from "./CalculatorMenu";
+import useAxios from "../api/useAxios";
 
 function CalculationPage() {
+    const axios = useAxios();
     const { id } = useParams();
     const [variables, setVariables] = useState([]);
     const [values, setValues] = useState({});
